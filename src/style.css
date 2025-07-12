@@ -328,6 +328,72 @@ body.main-app-active {
   font-style: italic;
 }
 
+/* Sample Data Section */
+.sample-data-section {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.sample-data-divider {
+  position: relative;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.sample-data-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border-color);
+  transform: translateY(-50%);
+}
+
+.sample-data-divider span {
+  background: var(--bg-primary);
+  padding: 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+.sample-data-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  margin-bottom: 0.75rem;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.sample-data-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+}
+
+.sample-data-btn .btn-icon {
+  font-size: 1.125rem;
+}
+
+.sample-data-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
+
 .landing-instructions {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -447,6 +513,16 @@ body.main-app-active {
   
   .landing-upload {
     margin-bottom: 1rem;
+  }
+  
+  .sample-data-btn {
+    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+    min-width: 180px;
+  }
+  
+  .sample-data-divider {
+    margin: 1.25rem 0;
   }
   
   .landing-features {

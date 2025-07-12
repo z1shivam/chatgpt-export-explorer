@@ -46,6 +46,12 @@ class ChatGPTExplorer {
     document.getElementById('landingThemeToggle').addEventListener('click', () => this.toggleTheme());
     document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileLoad(e));
     
+    // Sample data button
+    const loadSampleButton = document.getElementById('loadSampleData');
+    if (loadSampleButton) {
+      loadSampleButton.addEventListener('click', () => this.loadSampleData());
+    }
+    
     // Accessibility controls
     this.setupFontSizeControls();
     this.setupHighContrastToggle();
@@ -277,6 +283,37 @@ class ChatGPTExplorer {
   }
   async loadConversationsFile() {
     document.getElementById('fileInput').click();
+  }
+
+  async loadSampleData() {
+    try {
+      this.showLoading('Loading sample conversations...');
+      
+      const response = await fetch('./conversations.json');
+      if (!response.ok) {
+        throw new Error(`Failed to load sample data: ${response.status}`);
+      }
+      
+      const sampleConversations = await response.json();
+      console.log('Loaded sample conversations:', sampleConversations.length);
+      
+      // Clear existing data and store sample data
+      await dbOperations.clearAll();
+      const stats = await dbOperations.storeConversations(sampleConversations);
+      
+      console.log(`Loaded ${stats.conversations} conversations with ${stats.messages} messages`);
+      
+      // Reload conversations from database
+      await this.loadConversationsFromDB();
+      
+      this.hideLoading();
+      this.showMessage(`Successfully loaded ${stats.conversations} sample conversations!`);
+      
+    } catch (error) {
+      console.error('Error loading sample data:', error);
+      this.hideLoading();
+      this.showMessage('Failed to load sample conversations. Please try again.', 'error');
+    }
   }
   async handleFileLoad(event) {
     const file = event.target.files[0];
