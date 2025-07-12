@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <title>ChatGPT Conversation Explorer</title>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="app">
       <div id="landingScreen" class="landing-screen">
         <div class="landing-container">
@@ -88,6 +92,15 @@
             <h1>ChatGPT Explorer</h1>
           </div>
           <div class="header-right">
+            <div class="accessibility-controls">
+              <div class="font-size-control">
+                <button class="font-size-btn" data-size="small" title="Small font">A</button>
+                <button class="font-size-btn active" data-size="normal" title="Normal font">A</button>
+                <button class="font-size-btn" data-size="large" title="Large font">A</button>
+                <button class="font-size-btn" data-size="xl" title="Extra large font">A</button>
+              </div>
+              <button id="highContrastToggle" class="accessibility-toggle" title="Toggle high contrast">⚡</button>
+            </div>
             <button id="themeToggle" class="btn btn-secondary" title="Toggle dark/light mode">🌙</button>
             <button id="loadBtn" class="btn btn-primary">Load Conversations</button>
             <button id="clearBtn" class="btn btn-secondary">Clear Data</button>
@@ -95,11 +108,11 @@
         </header>
         
         <div class="main-container">
-        <aside class="sidebar">
+        <aside class="sidebar" role="navigation" aria-label="Conversations and search">
           <div class="search-box">
-            <input type="text" id="globalSearch" placeholder="Search across all conversations (Ctrl+Shift+K)" />
+            <input type="text" id="globalSearch" placeholder="Search across all conversations (Ctrl+Shift+K)" aria-label="Search all conversations" />
           </div>
-          <div class="conversations-list" id="conversationsList">
+          <div class="conversations-list" id="conversationsList" role="list" aria-label="Conversation list">
             <div class="no-data">No conversations loaded</div>
           </div>
           <div class="search-results" id="searchResults" style="display: none;">
@@ -112,23 +125,23 @@
           </div>
         </aside>
         
-        <main class="content">
+        <main class="content" id="main-content">
           <div class="conversation-header">
             <h2 id="conversationTitle">Select a conversation</h2>
             <div class="search-container">
               <div class="search-box">
-                <input type="text" id="conversationSearch" placeholder="Search current conversation (Ctrl+K)" />
+                <input type="text" id="conversationSearch" placeholder="Search current conversation (Ctrl+K)" aria-label="Search in current conversation" />
               </div>
               <div class="search-navigation" id="searchNavigation" style="display: none;">
-                <span class="search-results-count" id="searchResultsCount">0 results</span>
+                <span class="search-results-count" id="searchResultsCount" aria-live="polite">0 results</span>
                 <div class="search-nav-buttons">
-                  <button id="prevResult" class="search-nav-btn" title="Previous result (F3)">↑</button>
-                  <button id="nextResult" class="search-nav-btn" title="Next result (Shift+F3)">↓</button>
+                  <button id="prevResult" class="search-nav-btn" title="Previous result (F3)" aria-label="Go to previous search result">↑</button>
+                  <button id="nextResult" class="search-nav-btn" title="Next result (Shift+F3)" aria-label="Go to next search result">↓</button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="conversation-content" id="conversationContent">
+          <div class="conversation-content" id="conversationContent" role="main" aria-label="Conversation messages">
             <div class="no-conversation">Select a conversation from the sidebar to view its content</div>
           </div>
         </main>

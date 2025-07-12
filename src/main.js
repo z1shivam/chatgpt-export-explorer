@@ -12,6 +12,8 @@ class ChatGPTExplorer {
     this.currentSearchIndex = -1;
     this.currentSearchQuery = '';
     this.hasConversations = false;
+    this.currentFontSize = 'normal';
+    this.highContrastMode = false;
     this.init();
   }
   async init() {
@@ -20,6 +22,7 @@ class ChatGPTExplorer {
     this.setupDragAndDrop();
     await this.loadConversationsFromDB();
     this.setupKeyboardShortcuts();
+    this.setupAccessibilityControls();
     this.updateUI();
   }
   updateUI() {
@@ -28,9 +31,11 @@ class ChatGPTExplorer {
     if (this.hasConversations && this.conversations.length > 0) {
       landingScreen.style.display = 'none';
       mainApp.style.display = 'flex';
+      document.body.classList.add('main-app-active');
     } else {
       landingScreen.style.display = 'flex';
       mainApp.style.display = 'none';
+      document.body.classList.remove('main-app-active');
     }
   }
   bindEvents() {
@@ -40,6 +45,10 @@ class ChatGPTExplorer {
     document.getElementById('browseBtn').addEventListener('click', () => this.loadConversationsFile());
     document.getElementById('landingThemeToggle').addEventListener('click', () => this.toggleTheme());
     document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileLoad(e));
+    
+    // Accessibility controls
+    this.setupFontSizeControls();
+    this.setupHighContrastToggle();
   }
   setupDragAndDrop() {
     const dropzone = document.getElementById('dropzone');
@@ -102,6 +111,28 @@ class ChatGPTExplorer {
     document.getElementById('prevResult').addEventListener('click', () => this.navigateSearchResult(-1));
     document.getElementById('nextResult').addEventListener('click', () => this.navigateSearchResult(1));
     document.getElementById('clearSearchResults').addEventListener('click', () => this.clearSearchResults());
+    
+    // Accessibility keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Ctrl + Plus/Minus for font size
+      if (e.ctrlKey && e.key === '=') {
+        e.preventDefault();
+        const sizes = ['small', 'normal', 'large', 'xl'];
+        const currentIndex = sizes.indexOf(this.currentFontSize);
+        const nextIndex = Math.min(currentIndex + 1, sizes.length - 1);
+        this.setFontSize(sizes[nextIndex]);
+      } else if (e.ctrlKey && e.key === '-') {
+        e.preventDefault();
+        const sizes = ['small', 'normal', 'large', 'xl'];
+        const currentIndex = sizes.indexOf(this.currentFontSize);
+        const nextIndex = Math.max(currentIndex - 1, 0);
+        this.setFontSize(sizes[nextIndex]);
+      } else if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+        // Ctrl + Shift + H for high contrast
+        e.preventDefault();
+        this.toggleHighContrast();
+      }
+    });
   }
   clearSearchResults() {
     document.getElementById('globalSearch').value = '';
@@ -308,16 +339,33 @@ class ChatGPTExplorer {
         return;
       }
       const fragment = document.createDocumentFragment();
-      conversations.forEach(conversation => {
-        const item = document.createElement('div');
+      conversations.forEach((conversation, index) => {
+        const item = document.createElement('button');
         item.className = 'conversation-item';
         item.dataset.conversationId = conversation.conversation_id;
+        item.setAttribute('role', 'listitem');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('aria-label', `Conversation: ${conversation.title}`);
         const date = new Date(conversation.create_time * 1000).toLocaleDateString();
         item.innerHTML = `
           <div class="conversation-title">${this.escapeHtml(conversation.title)}</div>
           <div class="conversation-date">${date}</div>
         `;
         item.addEventListener('click', () => this.selectConversation(conversation));
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.selectConversation(conversation);
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const nextItem = item.nextElementSibling;
+            if (nextItem) nextItem.focus();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prevItem = item.previousElementSibling;
+            if (prevItem) prevItem.focus();
+          }
+        });
         fragment.appendChild(item);
       });
       conversationsList.innerHTML = '';
@@ -499,6 +547,64 @@ class ChatGPTExplorer {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  setupAccessibilityControls() {
+    // Load saved preferences
+    const savedFontSize = localStorage.getItem('fontSize') || 'normal';
+    const savedHighContrast = localStorage.getItem('highContrast') === 'true';
+    
+    this.setFontSize(savedFontSize);
+    if (savedHighContrast) {
+      this.toggleHighContrast();
+    }
+  }
+
+  setupFontSizeControls() {
+    const fontSizeButtons = document.querySelectorAll('.font-size-btn');
+    fontSizeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const size = btn.dataset.size;
+        this.setFontSize(size);
+      });
+    });
+  }
+
+  setupHighContrastToggle() {
+    const highContrastBtn = document.getElementById('highContrastToggle');
+    if (highContrastBtn) {
+      highContrastBtn.addEventListener('click', () => {
+        this.toggleHighContrast();
+      });
+    }
+  }
+
+  setFontSize(size) {
+    // Remove all font size classes
+    document.body.classList.remove('font-size-small', 'font-size-normal', 'font-size-large', 'font-size-xl');
+    
+    // Add the selected font size class
+    document.body.classList.add(`font-size-${size}`);
+    
+    this.currentFontSize = size;
+    localStorage.setItem('fontSize', size);
+    
+    // Update button states
+    document.querySelectorAll('.font-size-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.size === size);
+    });
+  }
+
+  toggleHighContrast() {
+    this.highContrastMode = !this.highContrastMode;
+    document.body.classList.toggle('high-contrast', this.highContrastMode);
+    localStorage.setItem('highContrast', this.highContrastMode);
+    
+    const btn = document.getElementById('highContrastToggle');
+    if (btn) {
+      btn.classList.toggle('active', this.highContrastMode);
+      btn.title = this.highContrastMode ? 'Disable High Contrast' : 'Enable High Contrast';
+    }
   }
 }
 const chatApp = new ChatGPTExplorer();
