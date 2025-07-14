@@ -1,6 +1,6 @@
 # ChatGPT Conversation Explorer
 
-A fast, efficient web application for exploring and searching through exported ChatGPT conversations. Built with vanilla JavaScript and Vite for optimal performance and professional code quality.
+A fast, efficient web application for exploring and searching through exported ChatGPT conversations. Built with vanilla JavaScript and Vite for optimal performance.
 
 ## Features
 
